@@ -1,59 +1,9 @@
-﻿生成启动时间为 2016/10/29 20:13:49。
-     1>项目“F:\学习\MyProject\Embedded Software\Evalboards\Microsoft\Windows\OS2\Visual Studio\OS2.vcxproj”在节点 2 上(Build 个目标)。
-     1>ClCompile:
-         F:\Tools\VS2013\VC\bin\CL.exe /c /I..\ /I..\..\BSP /I..\..\BSP\CPU /I"..\..\..\..\..\uC-CPU" /I"..\..\..\..\..\uC-CPU\Win32\Visual Studio" /I"..\..\..\..\..\uC-LIB" /I"..\..\..\..\..\uCOS-II\Source" /I"..\..\..\..\..\uCOS-II\Ports\Win32\Visual Studio" /ZI /nologo /W3 /WX- /sdl- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TC /analyze- /errorReport:prompt "..\..\..\..\..\uC-CPU\cpu_core.c" "..\..\..\..\..\uC-CPU\Win32\Visual Studio\cpu_c.c" "..\..\..\..\..\uC-LIB\lib_ascii.c" "..\..\..\..\..\uC-LIB\lib_math.c" "..\..\..\..\..\uC-LIB\lib_mem.c" "..\..\..\..\..\uC-LIB\lib_str.c" "..\..\..\..\..\uCOS-II\Ports\Win32\Visual Studio\os_cpu_c.c" "..\..\..\..\..\uCOS-II\Source\os_core.c" "..\..\..\..\..\uCOS-II\Source\os_dbg_r.c" "..\..\..\..\..\uCOS-II\Source\os_flag.c" "..\..\..\..\..\uCOS-II\Source\os_mbox.c" "..\..\..\..\..\uCOS-II\Source\os_mem.c" "..\..\..\..\..\uCOS-II\Source\os_mutex.c" "..\..\..\..\..\uCOS-II\Source\os_q.c" "..\..\..\..\..\uCOS-II\Source\os_sem.c" "..\..\..\..\..\uCOS-II\Source\os_task.c" "..\..\..\..\..\uCOS-II\Source\os_time.c" "..\..\..\..\..\uCOS-II\Source\os_tmr.c" ..\..\BSP\bsp.c ..\..\BSP\CPU\cpu_bsp.c ..\app.c ..\app_hooks.c
-         app_hooks.c
-         app.c
-     1>f:\学习\myproject\embedded software\evalboards\microsoft\windows\os2\app.c(133): warning C4087: “OSTimeGet”: 用“void”参数列表声明
-         cpu_bsp.c
-         bsp.c
-         os_tmr.c
-         os_time.c
-         os_task.c
-         os_sem.c
-         os_q.c
-         os_mutex.c
-         os_mem.c
-         os_mbox.c
-         os_flag.c
-         os_dbg_r.c
-         os_core.c
-         os_cpu_c.c
-         lib_str.c
-         lib_mem.c
-         lib_math.c
-         lib_ascii.c
-         正在生成代码...
-         正在编译...
-         cpu_c.c
-         cpu_core.c
-         正在生成代码...
-       Link:
-         F:\Tools\VS2013\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"F:\学习\MyProject\Embedded Software\Evalboards\Microsoft\Windows\OS2\Visual Studio\Debug\OS2.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\学习\MyProject\Embedded Software\Evalboards\Microsoft\Windows\OS2\Visual Studio\Debug\OS2.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\学习\MyProject\Embedded Software\Evalboards\Microsoft\Windows\OS2\Visual Studio\Debug\OS2.lib" /MACHINE:X86 Debug\cpu_core.obj
-         Debug\cpu_c.obj
-         Debug\lib_ascii.obj
-         Debug\lib_math.obj
-         Debug\lib_mem.obj
-         Debug\lib_str.obj
-         Debug\os_cpu_c.obj
-         Debug\os_core.obj
-         Debug\os_dbg_r.obj
-         Debug\os_flag.obj
-         Debug\os_mbox.obj
-         Debug\os_mem.obj
-         Debug\os_mutex.obj
-         Debug\os_q.obj
-         Debug\os_sem.obj
-         Debug\os_task.obj
-         Debug\os_time.obj
-         Debug\os_tmr.obj
-         Debug\bsp.obj
-         Debug\cpu_bsp.obj
-         Debug\app.obj
-         Debug\app_hooks.obj
-         OS2.vcxproj -> F:\学习\MyProject\Embedded Software\Evalboards\Microsoft\Windows\OS2\Visual Studio\Debug\OS2.exe
-     1>已完成生成项目“F:\学习\MyProject\Embedded Software\Evalboards\Microsoft\Windows\OS2\Visual Studio\OS2.vcxproj”(Build 个目标)的操作。
+﻿生成启动时间为 2016/11/1 0:35:56。
+     1>项目“F:\学习\MyProject\Embedded_Software\ucOS-II_EDF\Evalboards\Microsoft\Windows\OS2\Visual Studio\OS2.vcxproj”在节点 2 上(Build 个目标)。
+     1>Link:
+         OS2.vcxproj -> F:\学习\MyProject\Embedded_Software\ucOS-II_EDF\Evalboards\Microsoft\Windows\OS2\Visual Studio\Debug\OS2.exe
+     1>已完成生成项目“F:\学习\MyProject\Embedded_Software\ucOS-II_EDF\Evalboards\Microsoft\Windows\OS2\Visual Studio\OS2.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:09.43
+已用时间 00:00:00.13
