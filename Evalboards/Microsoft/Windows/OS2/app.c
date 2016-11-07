@@ -53,6 +53,8 @@
 */
 
 static  CPU_STK  AppTaskStartStk[APP_TASK_START_STK_SIZE];
+OS_STK TaskStk11[APP_TASK_START_STK_SIZE];
+OS_STK TaskStk12[APP_TASK_START_STK_SIZE];
 
 
 /*
@@ -62,7 +64,8 @@ static  CPU_STK  AppTaskStartStk[APP_TASK_START_STK_SIZE];
 */
 
 static  void  AppTaskStart(void  *p_arg);
-
+void Task11(void *p_arg);
+void Task12(void *p_arg);
 
 /*
 *********************************************************************************************************
@@ -81,15 +84,25 @@ int  main (void)
 {
     OSInit();                                                   /* Init uC/OS-II.                                       */
 
-    OSTaskCreateExt((void(*)(void *))AppTaskStart,              /* Create the start task                                */
-        (void          *) 0,
-        (OS_STK        *)&AppTaskStartStk[APP_TASK_START_STK_SIZE - 1],
-        (INT8U          ) APP_TASK_START_PRIO,
-        (INT16U         ) APP_TASK_START_PRIO,
-        (OS_STK        *)&AppTaskStartStk[0],
-        (INT32U         ) APP_TASK_START_STK_SIZE,
-        (void          *) 0,
-        (INT16U         )(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+    
+	OSTaskCreateExt((void(*)(void *))Task11,              /* Create the start task                                */
+		(void          *)0,
+		(OS_STK        *)&TaskStk11[APP_TASK_START_STK_SIZE - 1],
+		(INT8U)5,
+		(INT16U)APP_TASK_START_PRIO,
+		(OS_STK        *)&TaskStk11[0],
+		(INT32U)APP_TASK_START_STK_SIZE,
+		(void          *)0,
+		(INT16U)(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+	OSTaskCreateExt((void(*)(void *))Task12,              /* Create the start task                                */
+		(void          *)0,
+		(OS_STK        *)&TaskStk12[APP_TASK_START_STK_SIZE - 1],
+		(INT8U)6,
+		(INT16U)APP_TASK_START_PRIO,
+		(OS_STK        *)&TaskStk12[0],
+		(INT32U)APP_TASK_START_STK_SIZE,
+		(void          *)0,
+		(INT16U)(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II).  */
 }
@@ -131,20 +144,40 @@ static  void  AppTaskStart (void *p_arg)
         OSTimeDlyHMSM(0, 0, 1, 0);
 
         APP_TRACE_DBG(("Time: %d\n\r", OSTimeGet(&err)));
-		printf("test");
+		printf("test\n");
     }
 }
 void Task11(void *p_arg){
 
-	int start;
+	BSP_Init();                                                 /* Initialize BSP functions                             */
+	CPU_Init();
+
+	int start = 0;
 	int end;
 	int toDelay;
 
 	while (1){
-		while (OSTCBCur->compTime>0){
+		for (int i = 0; i < 100000000; i++) {
 
 		}
+		start++;
+		printf("task1:%d\n",start);
+		OSTimeDly(100);
+	}
 
+}
+void Task12(void *p_arg) {
+
+	int start = 0;
+	int end;
+	int toDelay;
+
+	while (1) {
+		for (int i = 0; i < 100000000; i++) {
+
+		}
+		start++;
+		printf("task2:%d\n",start);
 	}
 
 }
