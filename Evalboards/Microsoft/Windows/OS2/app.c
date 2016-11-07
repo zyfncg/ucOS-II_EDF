@@ -133,3 +133,17 @@ static  void  AppTaskStart (void *p_arg)
         APP_TRACE_DBG(("Time: %d\n\r", OSTimeGet(&err)));
     }
 }
+void Task11(void *p_arg){
+
+	int start;
+	int end;
+	int toDelay;
+
+	while (1){
+		while (OSTCBCur->compTime>0){
+
+		}
+
+	}
+
+}
