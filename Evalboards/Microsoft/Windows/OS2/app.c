@@ -131,5 +131,6 @@ static  void  AppTaskStart (void *p_arg)
         OSTimeDlyHMSM(0, 0, 1, 0);
 
         APP_TRACE_DBG(("Time: %d\n\r", OSTimeGet(&err)));
+		printf("test");
     }
 }
