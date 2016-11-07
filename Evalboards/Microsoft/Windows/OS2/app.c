@@ -84,7 +84,9 @@ int  main (void)
 {
     OSInit();                                                   /* Init uC/OS-II.                                       */
 
-    
+	BSP_Init();                                                 /* Initialize BSP functions                             */
+	CPU_Init();
+
 	OSTaskCreateExt((void(*)(void *))Task11,              /* Create the start task                                */
 		(void          *)0,
 		(OS_STK        *)&TaskStk11[APP_TASK_START_STK_SIZE - 1],
@@ -148,9 +150,6 @@ static  void  AppTaskStart (void *p_arg)
     }
 }
 void Task11(void *p_arg){
-
-	BSP_Init();                                                 /* Initialize BSP functions                             */
-	CPU_Init();
 
 	int start = 0;
 	int end;
