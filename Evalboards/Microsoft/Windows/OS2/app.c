@@ -134,3 +134,17 @@ static  void  AppTaskStart (void *p_arg)
 		printf("test");
     }
 }
+void Task11(void *p_arg){
+
+	int start;
+	int end;
+	int toDelay;
+
+	while (1){
+		while (OSTCBCur->compTime>0){
+
+		}
+
+	}
+
+}

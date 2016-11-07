@@ -1,0 +1,7 @@
+在app.c中添加任务函数
+
+
+在ucos_ii.h中修改os_tcb：
+添加
+INT32S			 compTime;
+long			 Deadline;
