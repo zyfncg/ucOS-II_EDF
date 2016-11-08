@@ -117,8 +117,8 @@ int  main (void)
 static void createTaskSet1(){
 
 
-	INT32U C11 = 100, C12 = 300;
-	INT32U T11 = 300, T12 = 600;
+	INT32U C11 = 1, C12 = 3;
+	INT32U T11 = 3, T12 = 6;
 	INT32U StartTime = 150;
 
 	task11Time[0] = C11;
@@ -132,7 +132,7 @@ static void createTaskSet1(){
 	OSTaskCreateExt((void(*)(void *))Task11,              /* Create the start task                                */
 		(void          *)0,
 		(OS_STK        *)&TaskStk11[APP_TASK_START_STK_SIZE - 1],
-		(INT8U)4,
+		(INT8U)2,
 		(INT16U)APP_TASK_START_PRIO,
 		(OS_STK        *)&TaskStk11[0],
 		(INT32U)APP_TASK_START_STK_SIZE,
@@ -141,7 +141,7 @@ static void createTaskSet1(){
 	OSTaskCreateExt((void(*)(void *))Task12,              /* Create the start task                                */
 		(void          *)0,
 		(OS_STK        *)&TaskStk12[APP_TASK_START_STK_SIZE - 1],
-		(INT8U)8,
+		(INT8U)4,
 		(INT16U)APP_TASK_START_PRIO,
 		(OS_STK        *)&TaskStk12[0],
 		(INT32U)APP_TASK_START_STK_SIZE,
@@ -174,35 +174,38 @@ static  void  AppTaskStart (void *p_arg)
 }
 void Task11(void *p_arg){
 
-	int start = 0;
-	int end;
 	int toDelay;
+	int T = task11Time[2] - task11Time[1];
 
 	while (1){
-		for (int i = 0; i < 100000000; i++) {
+		while (OSTCBCur->CompTime>0){
 
 		}
-		start++;
-		printf("task1:%d\n",start);
-		printf("start:%d  deadline:%d", OSTCBCur->StartTime, OSTCBCur->Deadline);
-		OSTimeDly(100);
+		toDelay = task11Time[2] - OSTimeGet();
+		task11Time[1] = task11Time[2];
+		task11Time[2] = task11Time[1] + T;
+		OSTCBCur->CompTime = task11Time[0];
+		OSTCBCur->Deadline = task11Time[2];
+		printf("task1     cuurent:%d  deadline:%d\n", OSTimeGet(), OSTCBCur->Deadline);
+		OSTimeDly(toDelay);
 	}
 
 }
 void Task12(void *p_arg) {
 
-	int start = 0;
-	int end;
 	int toDelay;
+	int T = task12Time[2] - task12Time[1];
 
 	while (1) {
-		for (int i = 0; i < 100000000; i++) {
+		while (OSTCBCur->CompTime>0) {
 
 		}
-		start++;
-		printf("task2:%d\n",start);
-		printf("start:%d  deadline:%d", OSTCBCur->StartTime, OSTCBCur->Deadline);
-		OSTimeDly(100);
+		toDelay = task12Time[2] - OSTimeGet();
+		task12Time[1] = task12Time[2];
+		task12Time[2] = task12Time[1] + T;
+		OSTCBCur->CompTime = task12Time[0];
+		printf("task2     start:%d  deadline:%d\n", OSTCBCur->StartTime, OSTCBCur->Deadline);
+		OSTimeDly(toDelay);
 	}
 
 }

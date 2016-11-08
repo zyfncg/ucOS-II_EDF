@@ -958,8 +958,11 @@ void  OSTimeTick (void)
             return;
         }
 #endif
+		OSTCBCur->CompTime = OSTCBCur->CompTime - 1;
+
         ptcb = OSTCBList;                                  /* Point at first TCB in TCB list               */
-        while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {     /* Go through all TCBs in TCB list              */
+		OS_TCB* hptcb = ptcb;
+		while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {     /* Go through all TCBs in TCB list              */
             OS_ENTER_CRITICAL();
             if (ptcb->OSTCBDly != 0u) {                    /* No, Delayed or waiting for event with TO     */
                 ptcb->OSTCBDly--;                          /* Decrement nbr of ticks to end of delay       */
@@ -978,6 +981,25 @@ void  OSTimeTick (void)
                     }
                 }
             }
+
+			if (ptcb->StartTime <= OSTimeGet()) {
+				if (hptcb->StartTime > OSTimeGet()) {
+					hptcb = ptcb;
+				}
+				if ((ptcb->Deadline < hptcb->Deadline)||
+					((ptcb->Deadline == hptcb->Deadline)&&(ptcb->StartTime<hptcb->StartTime))){
+					hptcb = ptcb;
+					INT8U hptcbPtio = hptcb->OSTCBPrio;
+					INT8U ptcbPtio = ptcb->OSTCBPrio;
+					INT8U tempPrio = 62u;
+					OSTaskChangePrio(hptcbPtio, tempPrio);
+					OSTaskChangePrio(ptcbPtio, hptcbPtio);
+					OSTaskChangePrio(tempPrio, ptcbPtio);
+				}
+
+			
+			}
+
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
