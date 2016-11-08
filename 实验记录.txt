@@ -3,5 +3,8 @@
 
 在ucos_ii.h中修改os_tcb：
 添加
-INT32S			 compTime;
-long			 Deadline;
+INT32U			 CompTime;
+INT32U			 StartTime;
+INT32U			 Deadline;
+
+在os_core.c中初始化以上三个变量

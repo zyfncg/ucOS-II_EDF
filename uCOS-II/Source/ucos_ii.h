@@ -599,8 +599,9 @@ typedef struct os_tcb {
     INT8U            OSTCBStatPend;         /* Task PEND status                                        */
     INT8U            OSTCBPrio;             /* Task priority (0 == highest)                            */
 
-	INT32S			 compTime;				/* 剩余执行时间*/
-	long			 Deadline;				/* 截止时间，如果已执行完，值为-1*/
+	INT32U			 CompTime;				/* 剩余执行时间*/
+	INT32U			 StartTime;				/* 开始时间*/
+	INT32U			 Deadline;				/* 截止时间*/
 
     INT8U            OSTCBX;                /* Bit position in group  corresponding to task priority   */
     INT8U            OSTCBY;                /* Index into ready table corresponding to task priority   */

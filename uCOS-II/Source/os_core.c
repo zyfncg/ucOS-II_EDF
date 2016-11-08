@@ -1996,7 +1996,14 @@ INT8U  OS_TCBInit (INT8U    prio,
         ptcb->OSTCBDly           = 0u;                     /* Task is not delayed                      */
 
 #if OS_TASK_CREATE_EXT_EN > 0u
-        ptcb->OSTCBExtPtr        = pext;                   /* Store pointer to TCB extension           */
+        ptcb->OSTCBExtPtr        = (INT32U*)pext;          /* Store pointer to TCB extension           */
+		INT32U* timePtr			 = (INT32U*)pext;
+		if (timePtr != 0){
+			ptcb->CompTime = *(timePtr);
+			ptcb->StartTime = *(timePtr + 1);
+			ptcb->Deadline = *(timePtr + 2);
+		}
+		
         ptcb->OSTCBStkSize       = stk_size;               /* Store stack size                         */
         ptcb->OSTCBStkBottom     = pbos;                   /* Store pointer to bottom of stack         */
         ptcb->OSTCBOpt           = opt;                    /* Store task options                       */

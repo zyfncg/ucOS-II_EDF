@@ -57,16 +57,21 @@ OS_STK TaskStk11[APP_TASK_START_STK_SIZE];
 OS_STK TaskStk12[APP_TASK_START_STK_SIZE];
 
 
+INT32U task11Time[3];
+INT32U task12Time[3];
+
 /*
 *********************************************************************************************************
 *                                         FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
 
+
+
 static  void  AppTaskStart(void  *p_arg);
 void Task11(void *p_arg);
 void Task12(void *p_arg);
-
+void createTaskSet1();
 /*
 *********************************************************************************************************
 *                                                main()
@@ -86,25 +91,8 @@ int  main (void)
 
 	BSP_Init();                                                 /* Initialize BSP functions                             */
 	CPU_Init();
-
-	OSTaskCreateExt((void(*)(void *))Task11,              /* Create the start task                                */
-		(void          *)0,
-		(OS_STK        *)&TaskStk11[APP_TASK_START_STK_SIZE - 1],
-		(INT8U)5,
-		(INT16U)APP_TASK_START_PRIO,
-		(OS_STK        *)&TaskStk11[0],
-		(INT32U)APP_TASK_START_STK_SIZE,
-		(void          *)0,
-		(INT16U)(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
-	OSTaskCreateExt((void(*)(void *))Task12,              /* Create the start task                                */
-		(void          *)0,
-		(OS_STK        *)&TaskStk12[APP_TASK_START_STK_SIZE - 1],
-		(INT8U)6,
-		(INT16U)APP_TASK_START_PRIO,
-		(OS_STK        *)&TaskStk12[0],
-		(INT32U)APP_TASK_START_STK_SIZE,
-		(void          *)0,
-		(INT16U)(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+	
+	createTaskSet1();
 
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II).  */
 }
@@ -125,6 +113,41 @@ int  main (void)
 *                   used.  The compiler should not generate any code for this statement.
 *********************************************************************************************************
 */
+
+static void createTaskSet1(){
+
+
+	INT32U C11 = 100, C12 = 300;
+	INT32U T11 = 300, T12 = 600;
+	INT32U StartTime = 150;
+
+	task11Time[0] = C11;
+	task11Time[1] = StartTime;
+	task11Time[2] = StartTime + T11;
+
+	task12Time[0] = C12;
+	task12Time[1] = StartTime;
+	task12Time[2] = StartTime + T12;
+
+	OSTaskCreateExt((void(*)(void *))Task11,              /* Create the start task                                */
+		(void          *)0,
+		(OS_STK        *)&TaskStk11[APP_TASK_START_STK_SIZE - 1],
+		(INT8U)4,
+		(INT16U)APP_TASK_START_PRIO,
+		(OS_STK        *)&TaskStk11[0],
+		(INT32U)APP_TASK_START_STK_SIZE,
+		(void          *)task11Time,
+		(INT16U)(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+	OSTaskCreateExt((void(*)(void *))Task12,              /* Create the start task                                */
+		(void          *)0,
+		(OS_STK        *)&TaskStk12[APP_TASK_START_STK_SIZE - 1],
+		(INT8U)8,
+		(INT16U)APP_TASK_START_PRIO,
+		(OS_STK        *)&TaskStk12[0],
+		(INT32U)APP_TASK_START_STK_SIZE,
+		(void          *)task12Time,
+		(INT16U)(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
+}
 
 static  void  AppTaskStart (void *p_arg)
 {
@@ -161,6 +184,7 @@ void Task11(void *p_arg){
 		}
 		start++;
 		printf("task1:%d\n",start);
+		printf("start:%d  deadline:%d", OSTCBCur->StartTime, OSTCBCur->Deadline);
 		OSTimeDly(100);
 	}
 
@@ -177,6 +201,8 @@ void Task12(void *p_arg) {
 		}
 		start++;
 		printf("task2:%d\n",start);
+		printf("start:%d  deadline:%d", OSTCBCur->StartTime, OSTCBCur->Deadline);
+		OSTimeDly(100);
 	}
 
 }
