@@ -26,6 +26,7 @@
 #ifndef  OS_MASTER_FILE
 #define  OS_GLOBALS
 #include <ucos_ii.h>
+#include <stdio.h>
 #endif
 
 /*
@@ -961,7 +962,7 @@ void  OSTimeTick (void)
 		OSTCBCur->CompTime = OSTCBCur->CompTime - 1;
 
         ptcb = OSTCBList;                                  /* Point at first TCB in TCB list               */
-		OS_TCB* hptcb = ptcb;
+		OS_TCB* hptcb = OSTCBCur;
 		while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {     /* Go through all TCBs in TCB list              */
             OS_ENTER_CRITICAL();
             if (ptcb->OSTCBDly != 0u) {                    /* No, Delayed or waiting for event with TO     */
@@ -982,16 +983,25 @@ void  OSTimeTick (void)
                 }
             }
 
-			if (ptcb->OSTCBDly == 0u && ptcb->OSTCBExtPtr != 0) {
+			if (ptcb->OSTCBDly == 0u && ptcb->OSTCBExtPtr != 0 && hptcb->OSTCBExtPtr != 0) {
 				if (hptcb->OSTCBDly != 0u && hptcb != ptcb) {
-					hptcb = ptcb;
-				}
-				if ((ptcb->Deadline < hptcb->Deadline)||
-					((ptcb->Deadline == hptcb->Deadline)&&(ptcb->StartTime<hptcb->StartTime))){
-					hptcb = ptcb;
+
 					INT8U hptcbPtio = hptcb->OSTCBPrio;
 					INT8U ptcbPtio = ptcb->OSTCBPrio;
 					INT8U tempPrio = 59u;
+					hptcb = ptcb;
+					OSTaskChangePrio(hptcbPtio, tempPrio);
+					OSTaskChangePrio(ptcbPtio, hptcbPtio);
+					OSTaskChangePrio(tempPrio, ptcbPtio);
+				}
+				if ((ptcb->Deadline < hptcb->Deadline)||
+					((ptcb->Deadline == hptcb->Deadline)&&
+					(ptcb->StartTime < hptcb->StartTime))){
+					
+					INT8U hptcbPtio = hptcb->OSTCBPrio;
+					INT8U ptcbPtio = ptcb->OSTCBPrio;
+					INT8U tempPrio = 59u;
+					hptcb = ptcb;
 					OSTaskChangePrio(hptcbPtio, tempPrio);
 					OSTaskChangePrio(ptcbPtio, hptcbPtio);
 					OSTaskChangePrio(tempPrio, ptcbPtio);
@@ -1690,29 +1700,42 @@ void  OS_Sched (void)
 
 
     OS_ENTER_CRITICAL();
-	OS_TCB* ptcb = OSTCBList;                          /* Point at first TCB in TCB list               */
-	OS_TCB* hptcb = OSTCBHighRdy;
-	while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {     /* Go through all TCBs in TCB list              */
-
-		if (ptcb->OSTCBDly == 0u && ptcb->OSTCBExtPtr != 0) {
-			if (hptcb->OSTCBDly != 0u && hptcb != ptcb) {
-				hptcb = ptcb;
-			}
-			if ((ptcb->Deadline < hptcb->Deadline) ||
-				((ptcb->Deadline == hptcb->Deadline) && (ptcb->StartTime<hptcb->StartTime))){
-				hptcb = ptcb;
-				INT8U hptcbPtio = hptcb->OSTCBPrio;
-				INT8U ptcbPtio = ptcb->OSTCBPrio;
-				INT8U tempPrio = 59u;
-				OSTaskChangePrio(hptcbPtio, tempPrio);
-				OSTaskChangePrio(ptcbPtio, hptcbPtio);
-				OSTaskChangePrio(tempPrio, ptcbPtio);
-			}
-		}
-		ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
-	}
+	
     if (OSIntNesting == 0u) {                          /* Schedule only if all ISRs done and ...       */
         if (OSLockNesting == 0u) {                     /* ... scheduler is not locked                  */
+			
+			//调整优先级
+			OS_TCB* ptcb = OSTCBList;                          /* Point at first TCB in TCB list               */
+			OS_TCB* hptcb = OSTCBCur;
+			while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {     /* Go through all TCBs in TCB list              */
+
+				if (ptcb->OSTCBDly == 0u && ptcb->OSTCBExtPtr != 0 && hptcb->OSTCBExtPtr != 0) {
+					if (hptcb->OSTCBDly != 0u && hptcb != ptcb) {
+
+						INT8U hptcbPtio = hptcb->OSTCBPrio;
+						INT8U ptcbPtio = ptcb->OSTCBPrio;
+						INT8U tempPrio = 59u;
+						hptcb = ptcb;
+						OSTaskChangePrio(hptcbPtio, tempPrio);
+						OSTaskChangePrio(ptcbPtio, hptcbPtio);
+						OSTaskChangePrio(tempPrio, ptcbPtio);
+					}
+					if ((ptcb->Deadline < hptcb->Deadline) ||
+						((ptcb->Deadline == hptcb->Deadline) &&
+						(ptcb->StartTime < hptcb->StartTime))) {
+
+						INT8U hptcbPtio = hptcb->OSTCBPrio;
+						INT8U ptcbPtio = ptcb->OSTCBPrio;
+						INT8U tempPrio = 59u;
+						hptcb = ptcb;
+						OSTaskChangePrio(hptcbPtio, tempPrio);
+						OSTaskChangePrio(ptcbPtio, hptcbPtio);
+						OSTaskChangePrio(tempPrio, ptcbPtio);
+					}
+				}
+				ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
+			}
+
             OS_SchedNew();
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
             if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */

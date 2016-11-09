@@ -30,6 +30,7 @@
 */
 
 #include <ucos_ii.h>
+#include <stdio.h>
 
 /*
 *********************************************************************************************************
@@ -241,7 +242,7 @@ void  App_TCBInitHook(OS_TCB *ptcb)
 #if OS_TIME_TICK_HOOK_EN > 0
 void  App_TimeTickHook(void)
 {
-
+	printf("%d\n", OSTime);
 }
 #endif
 
