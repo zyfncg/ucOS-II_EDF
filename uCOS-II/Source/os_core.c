@@ -982,8 +982,8 @@ void  OSTimeTick (void)
                 }
             }
 
-			if (ptcb->StartTime <= OSTimeGet()) {
-				if (hptcb->StartTime > OSTimeGet()) {
+			if (ptcb->OSTCBDly == 0u && ptcb->OSTCBExtPtr != 0) {
+				if (hptcb->OSTCBDly != 0u && hptcb != ptcb) {
 					hptcb = ptcb;
 				}
 				if ((ptcb->Deadline < hptcb->Deadline)||
@@ -991,7 +991,7 @@ void  OSTimeTick (void)
 					hptcb = ptcb;
 					INT8U hptcbPtio = hptcb->OSTCBPrio;
 					INT8U ptcbPtio = ptcb->OSTCBPrio;
-					INT8U tempPrio = 62u;
+					INT8U tempPrio = 59u;
 					OSTaskChangePrio(hptcbPtio, tempPrio);
 					OSTaskChangePrio(ptcbPtio, hptcbPtio);
 					OSTaskChangePrio(tempPrio, ptcbPtio);
@@ -1690,6 +1690,27 @@ void  OS_Sched (void)
 
 
     OS_ENTER_CRITICAL();
+	OS_TCB* ptcb = OSTCBList;                          /* Point at first TCB in TCB list               */
+	OS_TCB* hptcb = OSTCBHighRdy;
+	while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {     /* Go through all TCBs in TCB list              */
+
+		if (ptcb->OSTCBDly == 0u && ptcb->OSTCBExtPtr != 0) {
+			if (hptcb->OSTCBDly != 0u && hptcb != ptcb) {
+				hptcb = ptcb;
+			}
+			if ((ptcb->Deadline < hptcb->Deadline) ||
+				((ptcb->Deadline == hptcb->Deadline) && (ptcb->StartTime<hptcb->StartTime))){
+				hptcb = ptcb;
+				INT8U hptcbPtio = hptcb->OSTCBPrio;
+				INT8U ptcbPtio = ptcb->OSTCBPrio;
+				INT8U tempPrio = 59u;
+				OSTaskChangePrio(hptcbPtio, tempPrio);
+				OSTaskChangePrio(ptcbPtio, hptcbPtio);
+				OSTaskChangePrio(tempPrio, ptcbPtio);
+			}
+		}
+		ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
+	}
     if (OSIntNesting == 0u) {                          /* Schedule only if all ISRs done and ...       */
         if (OSLockNesting == 0u) {                     /* ... scheduler is not locked                  */
             OS_SchedNew();
@@ -1705,8 +1726,8 @@ void  OS_Sched (void)
                 OS_TLS_TaskSw();
 #endif
 #endif
-
                 OS_TASK_SW();                          /* Perform a context switch                     */
+				printf("%d    Complete    %d      %d\n", OSTimeGet(), OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBPrio);
             }
         }
     }

@@ -202,7 +202,7 @@ void  App_TaskReturnHook(OS_TCB  *ptcb)
 #if OS_TASK_SW_HOOK_EN > 0
 void  App_TaskSwHook(void)
 {
-
+	printf("%d    Preempt     %d      %d\n", OSTimeGet(), OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBPrio);
 }
 #endif
 

@@ -91,6 +91,16 @@ int  main (void)
 
 	BSP_Init();                                                 /* Initialize BSP functions                             */
 	CPU_Init();
+
+	//OSTaskCreateExt((void(*)(void *))AppTaskStart,              /* Create the start task                                */
+	//	(void          *)0,
+	//	(OS_STK        *)&AppTaskStartStk[APP_TASK_START_STK_SIZE - 1],
+	//	(INT8U)1u,
+	//	(INT16U)0u,
+	//	(OS_STK        *)&AppTaskStartStk[0],
+	//	(INT32U)APP_TASK_START_STK_SIZE,
+	//	(void          *)0,
+	//	(INT16U)(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 	
 	createTaskSet1();
 
@@ -132,8 +142,8 @@ static void createTaskSet1(){
 	OSTaskCreateExt((void(*)(void *))Task11,              /* Create the start task                                */
 		(void          *)0,
 		(OS_STK        *)&TaskStk11[APP_TASK_START_STK_SIZE - 1],
-		(INT8U)2,
-		(INT16U)APP_TASK_START_PRIO,
+		(INT8U)1u,
+		(INT16U)1u,
 		(OS_STK        *)&TaskStk11[0],
 		(INT32U)APP_TASK_START_STK_SIZE,
 		(void          *)task11Time,
@@ -141,8 +151,8 @@ static void createTaskSet1(){
 	OSTaskCreateExt((void(*)(void *))Task12,              /* Create the start task                                */
 		(void          *)0,
 		(OS_STK        *)&TaskStk12[APP_TASK_START_STK_SIZE - 1],
-		(INT8U)4,
-		(INT16U)APP_TASK_START_PRIO,
+		(INT8U)2u,
+		(INT16U)2u,
 		(OS_STK        *)&TaskStk12[0],
 		(INT32U)APP_TASK_START_STK_SIZE,
 		(void          *)task12Time,
@@ -156,9 +166,7 @@ static  void  AppTaskStart (void *p_arg)
 
    (void)p_arg;
 
-    BSP_Init();                                                 /* Initialize BSP functions                             */
-    CPU_Init();                                                 /* Initialize uC/CPU services                           */
-
+   
 #if OS_CFG_STAT_TASK_EN > 0u
     OSStatTaskCPUUsageInit(&err);                               /* Compute CPU capacity with no task running            */
 #endif
@@ -166,16 +174,23 @@ static  void  AppTaskStart (void *p_arg)
     APP_TRACE_DBG(("uCOS-II is Running...\n\r"));
 
     while (DEF_ON) {                                            /* Task body, always written as an infinite loop.       */
-        OSTimeDlyHMSM(0, 0, 1, 0);
+       /* OSTimeDlyHMSM(0, 0, 1, 0);
 
         APP_TRACE_DBG(("Time: %d\n\r", OSTimeGet(&err)));
-		printf("test\n");
+		printf("test\n");*/
+		if (OSTimeGet() >= 150){
+			OSTaskChangePrio(1,60);
+			//OSTimeDly(10);
+		}
     }
 }
 void Task11(void *p_arg){
 
 	int toDelay;
 	int T = task11Time[2] - task11Time[1];
+	if (OSTimeGet()<150){
+		OSTimeDly(150 - OSTimeGet());
+	}
 
 	while (1){
 		while (OSTCBCur->CompTime>0){
@@ -185,8 +200,9 @@ void Task11(void *p_arg){
 		task11Time[1] = task11Time[2];
 		task11Time[2] = task11Time[1] + T;
 		OSTCBCur->CompTime = task11Time[0];
+		OSTCBCur->StartTime = task11Time[1];
 		OSTCBCur->Deadline = task11Time[2];
-		printf("task1     cuurent:%d  deadline:%d\n", OSTimeGet(), OSTCBCur->Deadline);
+		//printf("task1     cuurent:%d  deadline:%d\n", OSTimeGet(), OSTCBCur->Deadline);
 		OSTimeDly(toDelay);
 	}
 
@@ -196,6 +212,9 @@ void Task12(void *p_arg) {
 	int toDelay;
 	int T = task12Time[2] - task12Time[1];
 
+	if (OSTimeGet()<150){
+		OSTimeDly(150 - OSTimeGet());
+	}
 	while (1) {
 		while (OSTCBCur->CompTime>0) {
 
@@ -204,7 +223,9 @@ void Task12(void *p_arg) {
 		task12Time[1] = task12Time[2];
 		task12Time[2] = task12Time[1] + T;
 		OSTCBCur->CompTime = task12Time[0];
-		printf("task2     start:%d  deadline:%d\n", OSTCBCur->StartTime, OSTCBCur->Deadline);
+		OSTCBCur->StartTime = task11Time[1];
+		OSTCBCur->Deadline = task12Time[2];
+		//printf("task2     current:%d  deadline:%d\n", OSTimeGet(), OSTCBCur->Deadline);
 		OSTimeDly(toDelay);
 	}
 
