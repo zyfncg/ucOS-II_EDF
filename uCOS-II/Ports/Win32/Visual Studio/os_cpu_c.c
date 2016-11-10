@@ -916,6 +916,8 @@ void  OSIntCtxSw (void)
 {
     OSTaskSwHook();
 
+	printf("%d    Preempt     %d      %d\n", OSTimeGet(), OSTCBCur->OSTCBId, OSTCBHighRdy->OSTCBId);
+
     OSTCBCur  = OSTCBHighRdy;
     OSPrioCur = OSPrioHighRdy;
 }

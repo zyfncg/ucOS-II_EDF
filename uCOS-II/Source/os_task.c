@@ -159,7 +159,7 @@ INT8U  OSTaskChangePrio (INT8U  oldprio,
     ptcb->OSTCBBitX = bitx_new;
     OS_EXIT_CRITICAL();
     if (OSRunning == OS_TRUE) {
-        OS_Sched();                                         /* Find new highest priority task          */
+//        OS_Sched();                                         /* Find new highest priority task          */
     }
     return (OS_ERR_NONE);
 }

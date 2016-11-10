@@ -129,7 +129,7 @@ static void createTaskSet1(){
 
 	INT32U C11 = 1, C12 = 3;
 	INT32U T11 = 3, T12 = 6;
-	INT32U StartTime = 150;
+	INT32U StartTime = 10;
 
 	task11Time[0] = C11;
 	task11Time[1] = StartTime;
@@ -188,8 +188,8 @@ void Task11(void *p_arg){
 
 	int toDelay;
 	int T = task11Time[2] - task11Time[1];
-	if (OSTimeGet()<150){
-		OSTimeDly(150 - OSTimeGet());
+	if (OSTimeGet()<10){
+		OSTimeDly(10 - OSTimeGet());
 	}
 
 	while (1){
@@ -212,8 +212,8 @@ void Task12(void *p_arg) {
 	int toDelay;
 	int T = task12Time[2] - task12Time[1];
 
-	if (OSTimeGet()<150){
-		OSTimeDly(150 - OSTimeGet());
+	if (OSTimeGet()<10){
+		OSTimeDly(10 - OSTimeGet());
 	}
 	while (1) {
 		while (OSTCBCur->CompTime>0) {

@@ -698,7 +698,7 @@ void  OSIntExit (void)
             if (OSLockNesting == 0u) {                     /* ... and not locked.                      */
                 OS_SchedNew();
                 OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
-                if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy */
+				if (OSTCBHighRdy != OSTCBCur) {          /* No Ctx Sw if current task is highest rdy */
 #if OS_TASK_PROFILE_EN > 0u
                     OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task  */
 #endif
@@ -959,10 +959,12 @@ void  OSTimeTick (void)
             return;
         }
 #endif
-		OSTCBCur->CompTime = OSTCBCur->CompTime - 1;
-
+		if (OSTCBCur->OSTCBExtPtr != 0 && OSTCBCur->OSTCBDly == 0){
+			OSTCBCur->CompTime = OSTCBCur->CompTime - 1;
+		}
+		
         ptcb = OSTCBList;                                  /* Point at first TCB in TCB list               */
-		OS_TCB* hptcb = OSTCBCur;
+		OS_TCB* hptcb = OSTCBPrioTbl[1];
 		while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {     /* Go through all TCBs in TCB list              */
             OS_ENTER_CRITICAL();
             if (ptcb->OSTCBDly != 0u) {                    /* No, Delayed or waiting for event with TO     */
@@ -1013,6 +1015,7 @@ void  OSTimeTick (void)
             ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
             OS_EXIT_CRITICAL();
         }
+		//printf("%d TIMETICK curid:%d highid:%d\n", OSTime,OSTCBCur->OSTCBId,OSTCBHighRdy->OSTCBId);
     }
 }
 
@@ -1706,7 +1709,7 @@ void  OS_Sched (void)
 			
 			//调整优先级
 			OS_TCB* ptcb = OSTCBList;                          /* Point at first TCB in TCB list               */
-			OS_TCB* hptcb = OSTCBCur;
+			OS_TCB* hptcb = OSTCBPrioTbl[1];
 			while (ptcb->OSTCBPrio != OS_TASK_IDLE_PRIO) {     /* Go through all TCBs in TCB list              */
 
 				if (ptcb->OSTCBDly == 0u && ptcb->OSTCBExtPtr != 0 && hptcb->OSTCBExtPtr != 0) {
@@ -1738,7 +1741,7 @@ void  OS_Sched (void)
 
             OS_SchedNew();
             OSTCBHighRdy = OSTCBPrioTbl[OSPrioHighRdy];
-            if (OSPrioHighRdy != OSPrioCur) {          /* No Ctx Sw if current task is highest rdy     */
+			if (OSTCBHighRdy != OSTCBCur) {          /* No Ctx Sw if current task is highest rdy     */
 #if OS_TASK_PROFILE_EN > 0u
                 OSTCBHighRdy->OSTCBCtxSwCtr++;         /* Inc. # of context switches to this task      */
 #endif
@@ -1749,8 +1752,9 @@ void  OS_Sched (void)
                 OS_TLS_TaskSw();
 #endif
 #endif
+				printf("%d    Complete    %d      %d\n", OSTimeGet(), OSTCBCur->OSTCBId, OSTCBHighRdy->OSTCBId);
                 OS_TASK_SW();                          /* Perform a context switch                     */
-				printf("%d    Complete    %d      %d\n", OSTimeGet(), OSTCBCur->OSTCBPrio, OSTCBHighRdy->OSTCBPrio);
+				
             }
         }
     }
@@ -2068,6 +2072,7 @@ INT8U  OS_TCBInit (INT8U    prio,
 			ptcb->CompTime = *(timePtr);
 			ptcb->StartTime = *(timePtr + 1);
 			ptcb->Deadline = *(timePtr + 2);
+			ptcb->OSTCBDly = ptcb->StartTime - OSTimeGet();
 		}
 		
         ptcb->OSTCBStkSize       = stk_size;               /* Store stack size                         */
