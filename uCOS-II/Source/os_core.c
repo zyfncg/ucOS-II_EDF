@@ -80,6 +80,8 @@ static  void  OS_InitTCBList(void);
 
 static  void  OS_SchedNew(void);
 
+void exchPrio(INT8U prio1, INT8U prio2);
+
 /*$PAGE*/
 /*
 *********************************************************************************************************
@@ -986,27 +988,24 @@ void  OSTimeTick (void)
             }
 
 			if (ptcb->OSTCBDly == 0u && ptcb->OSTCBExtPtr != 0 && hptcb->OSTCBExtPtr != 0) {
-				if (hptcb->OSTCBDly != 0u && hptcb != ptcb) {
+				if (ptcb->Deadline == hptcb->Deadline) {
+					INT32U restTime = ptcb->Deadline - OSTimeGet();
+					if ((ptcb->CompTime + hptcb->CompTime) > restTime ) {
 
-					INT8U hptcbPtio = hptcb->OSTCBPrio;
-					INT8U ptcbPtio = ptcb->OSTCBPrio;
-					INT8U tempPrio = 59u;
-					hptcb = ptcb;
-					OSTaskChangePrio(hptcbPtio, tempPrio);
-					OSTaskChangePrio(ptcbPtio, hptcbPtio);
-					OSTaskChangePrio(tempPrio, ptcbPtio);
-				}
-				if ((ptcb->Deadline < hptcb->Deadline)||
-					((ptcb->Deadline == hptcb->Deadline)&&
-					(ptcb->StartTime < hptcb->StartTime))){
+						if (ptcb->OSTCBId < hptcb->OSTCBId) {
+							exchPrio(hptcb->OSTCBPrio, ptcb->OSTCBPrio);
+							hptcb = ptcb;
+						}
+						
+					}else if (ptcb->StartTime < hptcb->StartTime) {
+						exchPrio(hptcb->OSTCBPrio, ptcb->OSTCBPrio);
+						hptcb = ptcb;
+					}
+				}else if (ptcb->Deadline < hptcb->Deadline){
 					
-					INT8U hptcbPtio = hptcb->OSTCBPrio;
-					INT8U ptcbPtio = ptcb->OSTCBPrio;
-					INT8U tempPrio = 59u;
+					exchPrio(hptcb->OSTCBPrio, ptcb->OSTCBPrio);
 					hptcb = ptcb;
-					OSTaskChangePrio(hptcbPtio, tempPrio);
-					OSTaskChangePrio(ptcbPtio, hptcbPtio);
-					OSTaskChangePrio(tempPrio, ptcbPtio);
+					
 				}
 
 			
@@ -1017,6 +1016,16 @@ void  OSTimeTick (void)
         }
 		//printf("%d TIMETICK curid:%d highid:%d\n", OSTime,OSTCBCur->OSTCBId,OSTCBHighRdy->OSTCBId);
     }
+}
+
+//交换任务优先级
+void exchPrio(INT8U prio1,INT8U prio2) {
+
+	INT8U tempPrio = 59u;
+
+	OSTaskChangePrio(prio1, tempPrio);
+	OSTaskChangePrio(prio2, prio1);
+	OSTaskChangePrio(tempPrio, prio2);
 }
 
 /*$PAGE*/
@@ -1715,25 +1724,29 @@ void  OS_Sched (void)
 				if (ptcb->OSTCBDly == 0u && ptcb->OSTCBExtPtr != 0 && hptcb->OSTCBExtPtr != 0) {
 					if (hptcb->OSTCBDly != 0u && hptcb != ptcb) {
 
-						INT8U hptcbPtio = hptcb->OSTCBPrio;
-						INT8U ptcbPtio = ptcb->OSTCBPrio;
-						INT8U tempPrio = 59u;
+						exchPrio(hptcb->OSTCBPrio, ptcb->OSTCBPrio);
 						hptcb = ptcb;
-						OSTaskChangePrio(hptcbPtio, tempPrio);
-						OSTaskChangePrio(ptcbPtio, hptcbPtio);
-						OSTaskChangePrio(tempPrio, ptcbPtio);
 					}
-					if ((ptcb->Deadline < hptcb->Deadline) ||
-						((ptcb->Deadline == hptcb->Deadline) &&
-						(ptcb->StartTime < hptcb->StartTime))) {
+					if (ptcb->Deadline == hptcb->Deadline) {
+						INT32U restTime = ptcb->Deadline - OSTimeGet();
+						if ((ptcb->CompTime + hptcb->CompTime) > restTime) {
 
-						INT8U hptcbPtio = hptcb->OSTCBPrio;
-						INT8U ptcbPtio = ptcb->OSTCBPrio;
-						INT8U tempPrio = 59u;
+							if (ptcb->OSTCBId < hptcb->OSTCBId) {
+								exchPrio(hptcb->OSTCBPrio, ptcb->OSTCBPrio);
+								hptcb = ptcb;
+							}
+
+						}
+						else if (ptcb->StartTime < hptcb->StartTime) {
+							exchPrio(hptcb->OSTCBPrio, ptcb->OSTCBPrio);
+							hptcb = ptcb;
+						}
+					}
+					else if (ptcb->Deadline < hptcb->Deadline) {
+
+						exchPrio(hptcb->OSTCBPrio, ptcb->OSTCBPrio);
 						hptcb = ptcb;
-						OSTaskChangePrio(hptcbPtio, tempPrio);
-						OSTaskChangePrio(ptcbPtio, hptcbPtio);
-						OSTaskChangePrio(tempPrio, ptcbPtio);
+
 					}
 				}
 				ptcb = ptcb->OSTCBNext;                        /* Point at next TCB in TCB list                */
