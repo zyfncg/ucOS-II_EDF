@@ -113,8 +113,8 @@ int  main (void)
 	//	(void          *)0,
 	//	(INT16U)(OS_TASK_OPT_STK_CHK | OS_TASK_OPT_STK_CLR));
 	
-	createTaskSet1();
-	//createTaskSet2();
+	//createTaskSet1();
+	createTaskSet2();
 
     OSStart();                                                  /* Start multitasking (i.e. give control to uC/OS-II).  */
 }
@@ -298,12 +298,14 @@ void Task21(void *p_arg) {
 		OSTimeDly(StartTime - OSTimeGet());
 	}
 	while (1) {
+		printf("%d   t1Start  %d \n", OSTimeGet(), OSTCBCur->CompTime);
 		while (OSTCBCur->CompTime>0) {
-
+			
 		}
+		printf("%d   t1End \n", OSTimeGet());
 		toDelay = OSTCBCur->Deadline - OSTimeGet();
 		if (toDelay < 0) {
-			printf("task1 延时！\n");
+			printf("%d    Complete    1     延时\n", OSTimeGet());
 			OSTCBCur->CompTime = c;
 			OSTCBCur->StartTime = OSTimeGet();
 			OSTCBCur->Deadline = OSTCBCur->StartTime + T;
@@ -333,7 +335,7 @@ void Task22(void *p_arg) {
 		}
 		toDelay = OSTCBCur->Deadline - OSTimeGet();
 		if (toDelay < 0) {
-			printf("task2 延时！\n");
+			printf("%d    Complete    2     延时\n", OSTimeGet());
 			OSTCBCur->CompTime = c;
 			OSTCBCur->StartTime = OSTimeGet();
 			OSTCBCur->Deadline = OSTCBCur->StartTime + T;
@@ -362,7 +364,7 @@ void Task23(void *p_arg) {
 		}
 		toDelay = OSTCBCur->Deadline - OSTimeGet();
 		if (toDelay < 0) {
-			printf("task3 延时！\n");
+			printf("%d    Complete    3     延时\n", OSTimeGet());
 			OSTCBCur->CompTime = c;
 			OSTCBCur->StartTime = OSTimeGet();
 			OSTCBCur->Deadline = OSTCBCur->StartTime + T;
