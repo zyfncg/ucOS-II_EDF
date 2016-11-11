@@ -69,6 +69,9 @@ void  OSTimeDly (INT32U ticks)
         OS_EXIT_CRITICAL();
         OS_Sched();                              /* Find next task to run!                             */
     }
+	if (ticks == 0u) {
+		OS_Sched();
+	}
 }
 /*$PAGE*/
 /*
